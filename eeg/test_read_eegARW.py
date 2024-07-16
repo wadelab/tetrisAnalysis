@@ -6,23 +6,27 @@ Created on Tue Jul 11 15:37:46 2023
 
 @author: db900, aw890
 """
-
+# To run this you need MNE installed in your environment (I think it is by default at YNIC) - and 
+# edit the path to the 
 import numpy as np
 import matplotlib.pyplot as plt
-
+import os
 import mne
-from sklearn.pipeline import make_pipeline
-from sklearn.preprocessing import StandardScaler
-from sklearn.linear_model import LogisticRegression
+
 
 legaltriggers = {
-    "17": 1,
+    "17": 1, # This is just messing around for now. Really we want to use these triggers to indicate the start of the expt, then pull all the others from psychopyu
+    "16": 2,
 }
 
 
+dataDir='/raid/projects/P1507_tetris/eeg/preprocessed/'
+filename ="SS001.set"
 
-filename = "/raid/projects/P1507_tetris/eeg/preprocessed/SS001.set"
-raw = mne.io.read_raw_eeglab(filename,preload=True)
+fullFile=os.path.join(dataDir,filename)
+print(fullFile)
+
+raw = mne.io.read_raw_eeglab(fullFile,preload=True)
 raw.drop_channels(["HEOG", "VEOG", "M1", "M2"])
 ANT_montage = mne.channels.make_standard_montage("standard_1020")
 raw.set_montage(ANT_montage)
