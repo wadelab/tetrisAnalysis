@@ -16,7 +16,7 @@ import mne
 
 legaltriggers = {
     "17": 1, # This is just messing around for now. Really we want to use these triggers to indicate the start of the expt, then pull all the others from psychopyu
-    "16": 2,
+    #"16": 2,
 }
 
 
