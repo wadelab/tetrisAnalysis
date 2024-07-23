@@ -16,7 +16,7 @@ import mne
 
 legaltriggers = {
     "17": 1, # This is just messing around for now. Really we want to use these triggers to indicate the start of the expt, then pull all the others from psychopyu
-    #"16": 2,
+    "16": 2,
 }
 
 
@@ -36,20 +36,21 @@ print(raw.info)
 #%%
 # pick some channels that clearly show heartbeats and blinks
 
-raw.plot(show_scrollbars=True)
-#%%
-filtered = raw.copy().filter(l_freq=1.0, h_freq=40)
-
-
-filtered.plot(show_scrollbars=True)
 #%%
 
-fig = filtered.plot_topomap(
-    0.1,  show_names=True, colorbar=False, size=6, res=128
-)
+filtered = raw.copy().resample(200).filter(l_freq=1.0, h_freq=40)
+
+#%%
+filtered.plot()   
+filtered.info['bads']=['CP1','CP4']
 #%%
 
+# Get the events from filtered so that we can crop front and back
+ev=mne.events_from_annotations(filtered)
 
+#  Find the event corresponding to 64 - note its time in samples
+
+filtered=filtered.crop(tmin=20,tmax=3000)
 ica = mne.preprocessing.ICA(n_components=20, random_state=97, max_iter=800)
 ica.fit(filtered)
 
@@ -65,7 +66,7 @@ ica.plot_components()
 
 ica.plot_properties(filtered)
 
-
+ica.exclude=[0,2]
 ica.apply(filtered)
 
 #%%
@@ -76,14 +77,13 @@ print(events[:5])  # show the first 5
 
 
 event_dict = {
-    "aTrigger": 1,
-
+    "aTrigger": 2,
 }
 
       
 
 reject_criteria = dict(
-    eeg=150e-6,  # 150 µV
+    eeg=10-6,  # 150 µV
 )  # 250 µV
 
 reject_criteria = None
@@ -105,3 +105,5 @@ t1 = epochs.average()
 
 t1.plot(time_unit="s")  # plot evoked response
 t1.plot_topomap(times=[-0.2,.1, 0.22, 0.4], average=0.05)
+
+# %%
